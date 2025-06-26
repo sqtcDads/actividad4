@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+   "module":"nodenext",
+    "baseUrl": ".",
+    "moduleResolution":"nodenext",  
+    "checkJs": true
+  },
+  "include": ["src/**/*.js"],
+  "exclude":["node_modules"]
+}
