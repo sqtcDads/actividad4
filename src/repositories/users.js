@@ -3,8 +3,8 @@ import UserModel from "../models/users.js"
 
 class UserRepository {
 
-    loginUser = async (email, password) => {
-        const user = await UserModel.findOne({ email, password }, "-password")
+    loginUser = async (email) => {
+        const user = await UserModel.findOne({ email }, "-__v -_id");
         return user
     }
 

@@ -7,9 +7,11 @@ import bodyParser from 'body-parser'
 import { engine } from 'express-handlebars'
 import mongoose from 'mongoose'
 import config from './config/index.js';
-import { initPassport } from "./middleware/passport.js"
+import { initPassport } from "./middleware/passportLocal.js"
 import passport from 'passport';
 import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import { initPassportJwt } from "./middleware/passportJwt.js"
 
 
 const app = express()
@@ -25,16 +27,18 @@ app.set('views', './src/views')
 app.use(express.json())
 app.use(bodyParser.urlencoded())
 app.use(bodyParser.json())
+app.use(cookieParser())
 app.set('trust proxy', 1)
 app.use(session({
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: true }
+    cookie: { secure: false }
 }))
 app.use(passport.initialize())
 app.use(passport.session())
 initPassport()
+initPassportJwt()
 app.use("/", viewsRouter)
 app.use("/api/users", userRouter)
 app.use("/api/session", sessionRouter)
