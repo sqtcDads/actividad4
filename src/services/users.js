@@ -4,19 +4,45 @@ import config from '../config/index.js';
 
 class UserService {
 
-    loginUser = async (req, res) => {
-        const { email, password } = req.body //destructuring
-        const hashedPassword = bcrypt.hashSync(password, config.SALT)
-        const user = await UserRepository.loginUser(email, hashedPassword)
+    // loginUser = async (req, res) => {
+    //     const { email, password } = req.body
+    //     const hashedPassword = bcrypt.hashSync(password, config.SALT)
+    //     const user = await UserRepository.loginUser(email, hashedPassword)
 
-        res.json(user)
-    }
+    //     res.json(user)
+    // }
 
     registerUser = async (req, res) => {
-        const user = req.body
-        const newUser = await UserRepository.registerUser(user)
-        res.json(newUser)
+        try {
+            const { first_name, last_name, email, age, password } = req.body
+            const hashedPassword = bcrypt.hashSync(password, 10);
+            const userData = { first_name, last_name, email, age, password: hashedPassword }
+            const newUser = await UserRepository.registerUser(userData)
+            return res.redirect("/login")
+        } catch (error) {
+            return res.redirect("/register")
+        }
+    }
 
+    checkEmail = async (req, res, next) => {
+        try {
+            const user = req.body
+            const isRegistered = await UserRepository.checkEmail(user.email)
+            if (isRegistered) {
+                return res.redirect("/login/password")
+            }
+            next()
+        } catch (error) {
+            res.redirect("/register")
+        }
+    }
+
+    validateLogin = (req, res, next) => {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.redirect("/login");
+        }
+        next();
     }
 
 }

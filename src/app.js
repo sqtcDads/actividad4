@@ -41,7 +41,7 @@ initPassport()
 initPassportJwt()
 app.use("/", viewsRouter)
 app.use("/api/users", userRouter)
-app.use("/api/session", sessionRouter)
+app.use("/api/sessions", sessionRouter)
 
 //endpoint
 app.get('/', (req, res) => {

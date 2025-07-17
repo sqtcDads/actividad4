@@ -2,6 +2,7 @@ import { Router } from "express";
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import config from '../config/index.js';
+import UserService from "../services/users.js";
 
 const viewsRouter = Router()
 
@@ -13,9 +14,22 @@ viewsRouter.get("/login", (req, res) => {
     res.render("login")
 })
 
+viewsRouter.post("/register",
+    UserService.checkEmail,
+    UserService.registerUser
+);
 viewsRouter.get("/register", (req, res) => {
-    res.render("register")
-})
+    res.render("register");
+});
+
+viewsRouter.post("/register/new",
+    (req, res, next) => {
+        const email = req.body
+
+    },
+    (req, res, next) => { },
+    (req, res) => { },
+)
 
 viewsRouter.get("/profile", passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
     const plainUser = req.user.toObject ? req.user.toObject() : req.user;
@@ -35,7 +49,7 @@ viewsRouter.post('/login/password',
             firstName: user.firstName,
             lastName: user.lastName,
             role: user.role
-        }, config.MONGO_SALT, { expiresIn: '2h' })
+        }, config.JWT_SECRET, { expiresIn: '2h' })
         res.cookie('jwt', token, {
             httpOnly: true
         })
