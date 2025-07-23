@@ -3,6 +3,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import config from "../config/index.js";
 import UserRepository from "../repositories/users.js";
+import userRouter from "./users.js";
 
 const sessionRouter = Router();
 
@@ -13,7 +14,7 @@ sessionRouter.post("/login",
         const token = jwt.sign(
             { email: user.email, role: user.role },
             config.JWT_SECRET,
-            { expiresIn: "2h" },
+            { expiresIn: "2h" }
         );
         res.cookie('jwt', token, { httpOnly: true });
         res.json({ status: "success", token });
@@ -23,7 +24,9 @@ sessionRouter.post("/login",
 sessionRouter.get("/current",
     passport.authenticate('jwt', { session: false }),
     (req, res) => {
-        res.json({ status: "success", user: req.user });
+        const user = req.user.toObject ? req.user.toObject() : req.user
+        delete user.password
+        res.json({ status: "success", user })
     }
 );
 

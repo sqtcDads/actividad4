@@ -22,19 +22,12 @@ viewsRouter.get("/register", (req, res) => {
     res.render("register");
 });
 
-viewsRouter.post("/register/new",
-    (req, res, next) => {
-        const email = req.body
-
-    },
-    (req, res, next) => { },
-    (req, res) => { },
-)
-
-viewsRouter.get("/profile", passport.authenticate('jwt', { session: false, failureRedirect: '/login' }), (req, res) => {
-    const plainUser = req.user.toObject ? req.user.toObject() : req.user;
-    res.render("profile", { user: plainUser })
-})
+viewsRouter.get("/profile",
+    passport.authenticate('jwt', { session: false, failureRedirect: '/login' }),
+    (req, res) => {
+        const plainUser = req.user.toObject ? req.user.toObject() : req.user;
+        res.render("profile", { user: plainUser })
+    })
 
 viewsRouter.get("/failed", (req, res) => {
     res.render("profile")

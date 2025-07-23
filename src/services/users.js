@@ -1,5 +1,6 @@
 import UserRepository from '../repositories/users.js';
 import bcrypt from 'bcrypt'
+import passport from 'passport';
 import config from '../config/index.js';
 
 class UserService {
@@ -29,7 +30,7 @@ class UserService {
             const user = req.body
             const isRegistered = await UserRepository.checkEmail(user.email)
             if (isRegistered) {
-                return res.redirect("/login/password")
+                return res.redirect("/register")
             }
             next()
         } catch (error) {
@@ -43,6 +44,15 @@ class UserService {
             return res.redirect("/login");
         }
         next();
+    }
+
+    authenticate = passport.authenticate('jwt', { session: false });
+    validateAdmin = (req, res, next) => {
+        if (req.user.role === "admin") {
+            next();
+        } else {
+            res.status(403).json({ message: "Forbidden" });
+        }
     }
 
 }

@@ -14,7 +14,6 @@ const cookieExtractor = function (req) {
 const opts = {}
 opts.jwtFromRequest = cookieExtractor;
 opts.secretOrKey = config.JWT_SECRET;
-console.log("desde passportjwt " + config.JWT_SECRET)
 async function verifyFunction(jwt_payload, done) {
     try {
         const user = await UserRepository.loginUser(jwt_payload.email);

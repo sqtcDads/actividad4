@@ -2,14 +2,19 @@ import passport from "passport";
 import bcrypt from "bcrypt"
 import UserRepository from '../repositories/users.js';
 import { Strategy as LocalStrategy } from "passport-local";
+import config from '../config/index.js';
 
 async function verifyFunction(email, password, cb) {
     try {
-        const user = await UserRepository.loginUser(email,);
+        const user = await UserRepository.loginUser(email);
         if (!user) {
             return cb(null, false, { message: "Incorrect email or password." });
         }
-        const isMatch = await bcrypt.compare(password, user.password);
+
+        const plainHashed = bcrypt.hashSync(password, config.MONGO_SALT);
+        // const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = user.password === plainHashed;
+
         if (!isMatch) {
             return cb(null, false, { message: "Incorrect email or password." });
         }
@@ -26,6 +31,7 @@ export const initPassport = () => {
         verifyFunction)
     passport.serializeUser(function (user, done) {
         done(null, user);
+
     });
 
     passport.deserializeUser(function (user, done) {
