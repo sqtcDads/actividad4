@@ -2,7 +2,6 @@ import passport from "passport";
 import bcrypt from "bcrypt"
 import UserRepository from '../repositories/users.js';
 import { Strategy as LocalStrategy } from "passport-local";
-import config from '../config/index.js';
 
 async function verifyFunction(email, password, cb) {
     try {
@@ -10,11 +9,7 @@ async function verifyFunction(email, password, cb) {
         if (!user) {
             return cb(null, false, { message: "Incorrect email or password." });
         }
-
-        const plainHashed = bcrypt.hashSync(password, config.MONGO_SALT);
-        // const isMatch = await bcrypt.compare(password, user.password);
-        const isMatch = user.password === plainHashed;
-
+        const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return cb(null, false, { message: "Incorrect email or password." });
         }

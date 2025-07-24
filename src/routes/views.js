@@ -6,11 +6,19 @@ import UserService from "../services/users.js";
 
 const viewsRouter = Router()
 
-viewsRouter.get("/", (req, res) => {
-    res.render("home")
-})
+viewsRouter.get("/",
+    passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        const user = req.user ? (req.user.toObject ? req.user.toObject() : req.user) : null;
+        res.render("home", { user });
+    });
 
-viewsRouter.get("/login", (req, res) => {
+viewsRouter.get("/logout", (req, res) => {
+    res.clearCookie('jwt');
+    res.redirect("/login");
+});
+
+viewsRouter.get("/login", UserService.redirectIfAuthenticated, (req, res) => {
     res.render("login")
 })
 
@@ -18,7 +26,7 @@ viewsRouter.post("/register",
     UserService.checkEmail,
     UserService.registerUser
 );
-viewsRouter.get("/register", (req, res) => {
+viewsRouter.get("/register", UserService.redirectIfAuthenticated, (req, res) => {
     res.render("register");
 });
 
@@ -36,11 +44,11 @@ viewsRouter.get("/failed", (req, res) => {
 viewsRouter.post('/login/password',
     passport.authenticate('local', { failureRedirect: '/login', failureMessage: true, failWithError: true }),
     function (req, res, next) {
-        const user = req.user;
+        const user = req.user
         const token = jwt.sign({
             email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            first_name: user.first_name,
+            last_name: user.last_name,
             role: user.role
         }, config.JWT_SECRET, { expiresIn: '2h' })
         res.cookie('jwt', token, {

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import config from "../config/index.js";
+
 
 const userSchema = new mongoose.Schema({
     first_name: { type: String, required: true },
@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save", function (next) {
     if (this.isModified("password")) {
-        this.password = bcrypt.hashSync(this.password, config.MONGO_SALT);
+        this.password = bcrypt.hashSync(this.password, 10);
     }
 
     next();

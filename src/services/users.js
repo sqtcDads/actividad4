@@ -5,19 +5,10 @@ import config from '../config/index.js';
 
 class UserService {
 
-    // loginUser = async (req, res) => {
-    //     const { email, password } = req.body
-    //     const hashedPassword = bcrypt.hashSync(password, config.SALT)
-    //     const user = await UserRepository.loginUser(email, hashedPassword)
-
-    //     res.json(user)
-    // }
-
     registerUser = async (req, res) => {
         try {
             const { first_name, last_name, email, age, password } = req.body
-            const hashedPassword = bcrypt.hashSync(password, 10);
-            const userData = { first_name, last_name, email, age, password: hashedPassword }
+            const userData = { first_name, last_name, email, age, password }
             const newUser = await UserRepository.registerUser(userData)
             return res.redirect("/login")
         } catch (error) {
@@ -55,6 +46,16 @@ class UserService {
         }
     }
 
+    redirectIfAuthenticated = (req, res, next) => {
+        passport.authenticate('jwt', { session: false }, (user) => {
+            if (user) {
+                return res.redirect('/profile');
+            }
+            next();
+        })(req, res, next);
+
+    }
 }
+
 export default new UserService()
 
